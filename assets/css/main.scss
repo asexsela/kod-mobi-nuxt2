@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.vjs-tree-node.is-highlight, .vjs-tree-node:hover {
+  background-color: #181921;
+}
