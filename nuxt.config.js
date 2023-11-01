@@ -4,6 +4,7 @@ export default {
   generate: {
     fallback: true
   },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'kod-mobi-nuxt2',
