@@ -11,7 +11,8 @@ import GrommetIconsLinkPrevious from "~/components/icons/prev-link.component.vue
 export default Vue.extend({
   data() {
     return {
-      isLoading: false
+      isLoading: false,
+      otp: null
     }
   },
   components: {GrommetIconsLinkPrevious, GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation},
@@ -76,6 +77,29 @@ export default Vue.extend({
       }
 
       return headers;
+    }
+  },
+  mounted() {
+    if ('OTPCredential' in window) {
+      const ac = new AbortController();
+
+      console.log('OTP exists')
+
+      this.$once('hook:beforeDestroy', () => {
+        ac.abort();
+      });
+
+      const options: any = {
+        otp: {transport: ['sms']},
+        signal: ac.signal
+      }
+
+      navigator.credentials.get(options).then((otp: any) => {
+        console.log(1, otp)
+        this.otp = otp?.code;
+      }).catch(err => {
+        console.error(2, err);
+      });
     }
   },
   methods: {
@@ -154,6 +178,19 @@ export default Vue.extend({
       <label class="label">
         <span class="label-text-alt">Язык</span>
         <span class="label-text-alt">не обязательно</span>
+      </label>
+    </div>
+
+    <!--  phone  -->
+    <div class="form-control w-full">
+      <label class="label">
+        <span class="label-text">OTP</span>
+        <span class="label-text-alt"></span>
+      </label>
+      <input v-model="otp" type="text" autocomplete="one-time-code" class="input input-bordered w-full"/>
+      <label class="label">
+        <span class="label-text-alt">one time password</span>
+        <span class="label-text-alt">test</span>
       </label>
     </div>
 
