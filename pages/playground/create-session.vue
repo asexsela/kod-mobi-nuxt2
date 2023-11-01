@@ -10,7 +10,7 @@ import GrommetIconsLinkNext from "~/components/icons/next-link.component.vue";
 export default Vue.extend({
   data() {
     return {
-      isLoading: false
+      isLoading: false,
     }
   },
   components: {GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation},
@@ -99,6 +99,26 @@ export default Vue.extend({
       }
 
       return headers;
+    }
+  },
+  mounted() {
+    if ('OTPCredential' in window) {
+      const ac = new AbortController();
+
+      console.log('OTP exists')
+
+
+      const options: any = {
+        otp: {transport: ['sms']},
+        signal: ac.signal
+      }
+
+      navigator.credentials.get(options).then((otp: any) => {
+        console.log(1, otp)
+        this.$store.commit('kod-mobi.store/setCode', otp?.code);
+      }).catch(err => {
+        console.error(2, err);
+      });
     }
   },
   methods: {

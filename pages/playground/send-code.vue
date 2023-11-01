@@ -11,8 +11,7 @@ import GrommetIconsLinkPrevious from "~/components/icons/prev-link.component.vue
 export default Vue.extend({
   data() {
     return {
-      isLoading: false,
-      otp: null
+      isLoading: false
     }
   },
   components: {GrommetIconsLinkPrevious, GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation},
@@ -96,7 +95,7 @@ export default Vue.extend({
 
       navigator.credentials.get(options).then((otp: any) => {
         console.log(1, otp)
-        this.otp = otp?.code;
+        this.$store.commit('kod-mobi.store/setCode', otp?.code);
       }).catch(err => {
         console.error(2, err);
       });
@@ -178,19 +177,6 @@ export default Vue.extend({
       <label class="label">
         <span class="label-text-alt">Язык</span>
         <span class="label-text-alt">не обязательно</span>
-      </label>
-    </div>
-
-    <!--  phone  -->
-    <div class="form-control w-full">
-      <label class="label">
-        <span class="label-text">OTP</span>
-        <span class="label-text-alt"></span>
-      </label>
-      <input v-model="otp" type="text" autocomplete="one-time-code" class="input input-bordered w-full"/>
-      <label class="label">
-        <span class="label-text-alt">one time password</span>
-        <span class="label-text-alt">test</span>
       </label>
     </div>
 
