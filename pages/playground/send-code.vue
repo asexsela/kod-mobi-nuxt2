@@ -85,9 +85,9 @@ export default Vue.extend({
 
       console.log('OTP exists')
 
-      this.$once('hook:beforeDestroy', () => {
-        ac.abort();
-      });
+      // this.$once('hook:beforeDestroy', () => {
+      //   ac.abort();
+      // });
 
       const options: any = {
         otp: {transport: ['sms']},
