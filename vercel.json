@@ -4,9 +4,7 @@
     {
       "src": "nuxt.config.js",
       "use": "@nuxtjs/vercel-builde",
-      "config": {
-        "serverFiles": ["./.nuxt/routes.json"]
-      }
+      "config": {}
     }
   ]
 }
