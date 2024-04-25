@@ -45,8 +45,8 @@ export default Vue.extend({
       if (!this.siteKey) {
         return;
       }
-      turnstile.ready(() => {
-        this.id = turnstile.render('.cf-turnstile', {
+      window.turnstile.ready(() => {
+        this.id = window.turnstile.render('.cf-turnstile', {
           sitekey: this.siteKey,
           action: this.action,
           refreshExpired: this.reset,
