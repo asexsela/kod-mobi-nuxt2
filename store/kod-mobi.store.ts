@@ -15,6 +15,7 @@ export const state = (): KodMobiState => ({
   url: 'https://api.kod.mobi/v1',
   apiKey: null,
   secretKey: null,
+  turnstileSiteKey: null,
 
   /*
   * @dev request body params
@@ -37,14 +38,19 @@ export const state = (): KodMobiState => ({
 })
 
 export const getters: IKodMobiGetter = {
-  /*
+  /**
+  * @dev CloudFlare turnstile site key
+  * */
+  getTurnstileSiteKey: state => state.turnstileSiteKey,
+
+  /**
   * @dev settings
   * */
   getUrl: state => state.url,
   getApiKey: state => state.apiKey,
   getSecretKey: state => state.secretKey,
 
-  /*
+  /**
   * @dev request body params
   * */
   getPhone: state => state.phone,
@@ -55,7 +61,7 @@ export const getters: IKodMobiGetter = {
   getSessionId: state => state.sessionId,
   getVerifyToken: state => state.verifyToken,
 
-  /*
+  /**
   * @dev kod.mobi responses
   * */
   createResponse: state => state.createResponse,
@@ -65,14 +71,19 @@ export const getters: IKodMobiGetter = {
 }
 
 export const mutations: IKodMobiMutation = {
-  /*
+  /**
+   * @dev CloudFlare turnstile site key
+   * */
+  setTurnstileSiteKey: (state: KodMobiState, siteKey: string) => state.turnstileSiteKey = siteKey,
+
+  /**
   * @dev settings
   * */
   setUrl: (state: KodMobiState, url: string) => state.url = url,
   setApiKey: (state: KodMobiState, apiKey: string) => state.apiKey = apiKey,
   setSecretKey: (state: KodMobiState, secretKey: string) => state.secretKey = secretKey,
 
-  /*
+  /**
   * @dev request body params
   * */
   setPhone: (state: KodMobiState, phone: string) => state.phone = phone,
@@ -83,7 +94,7 @@ export const mutations: IKodMobiMutation = {
   setSessionId: (state: KodMobiState, sessionId: string) => state.sessionId = sessionId,
   setVerifyToken: (state: KodMobiState, verifyToken: string) => state.verifyToken = verifyToken,
 
-  /*
+  /**
   * @dev kod.mobi responses
   * */
   setCreateResponse: (state: KodMobiState, response: KodMobiCreateResponseType) => state.createResponse = response,

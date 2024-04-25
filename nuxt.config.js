@@ -19,6 +19,14 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+    ],
+    script: [
+      {
+        src: '//challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      },
+      {
+        src: 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      }
     ]
   },
 

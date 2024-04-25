@@ -33,6 +33,7 @@ export default defineComponent({
         <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52">
           <li><NuxtLink to="/playground">Playground</NuxtLink></li>
           <li><NuxtLink to="/encription">Шифрование</NuxtLink></li>
+          <li><NuxtLink to="/examples">Пример</NuxtLink></li>
         </ul>
       </div>
     </div>

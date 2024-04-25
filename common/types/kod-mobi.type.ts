@@ -50,6 +50,7 @@ export type KodMobiState = {
   url: string;
   apiKey: string | null;
   secretKey: string | null;
+  turnstileSiteKey: string | null;
 
   /*
   * @dev request body params
@@ -72,7 +73,7 @@ export type KodMobiState = {
 }
 
 export type KodMobiHeaders = {
-  'x-api-key': string;
+  [key: string]: string;
 }
 
 export type KodMobiCreateSessionRequest = {

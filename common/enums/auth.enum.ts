@@ -1,0 +1,6 @@
+export enum AuthStep {
+  CREATE_SESSION,
+  SEND_CODE,
+  CHECK_CODE,
+  VERIFY_TOKEN
+}

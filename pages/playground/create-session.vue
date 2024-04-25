@@ -6,6 +6,8 @@ import {KodMobiCreateResponseType, KodMobiCreateSessionRequest, KodMobiHeaders} 
 import Endpoint from "~/components/endpoint.component.vue";
 import {RestMethod} from "~/common/enums/rest.enum";
 import GrommetIconsLinkNext from "~/components/icons/next-link.component.vue";
+import Challenge from "~/components/challenge.component.vue";
+import {ChallengeAction} from "~/common/enums/challenge.enum";
 
 export default Vue.extend({
   data() {
@@ -13,7 +15,7 @@ export default Vue.extend({
       isLoading: false,
     }
   },
-  components: {GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation},
+  components: {Challenge, GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation},
   computed: {
     RestMethod() {
       return RestMethod
@@ -30,6 +32,14 @@ export default Vue.extend({
       },
       set(value: string) {
         this.$store.commit('kod-mobi.store/setPhone', value);
+      }
+    },
+    action: {
+      get() {
+        return this.$store.getters['challenge.store/getAction'];
+      },
+      set(value: ChallengeAction) {
+        this.$store.commit('challenge.store/setAction', value);
       }
     },
     channelType: {
@@ -96,9 +106,23 @@ export default Vue.extend({
     getHeaders() {
       const headers: KodMobiHeaders = {
         'x-api-key': this.apiKey,
+        'X-CF-TURNSTILE-TOKEN': this.token,
       }
 
       return headers;
+    },
+    token: {
+      get() {
+        return this.$store.getters['challenge.store/getToken'];
+      },
+      set(value: string | null) {
+        this.$store.commit('challenge.store/setToken', value);
+      }
+    },
+    challengeLoading(): boolean {
+      const token: string = this.$store.getters['challenge.store/getToken'];
+      const siteKey: string = this.$store.getters['kod-mobi.store/getTurnstileSiteKey'];
+      return !token && !!siteKey
     }
   },
   mounted() {
@@ -106,7 +130,6 @@ export default Vue.extend({
       const ac = new AbortController();
 
       console.log('OTP exists')
-
 
       const options: any = {
         otp: {transport: ['sms']},
@@ -122,7 +145,12 @@ export default Vue.extend({
     }
   },
   methods: {
+    resetChallenge() {
+      this.token = null;
+      this.action = ChallengeAction.CREATE;
+    },
     async createCode() {
+
       /*
       * @dev enable loading
       * */
@@ -139,15 +167,15 @@ export default Vue.extend({
             const element: HTMLElement | null = document.getElementById('create-response')
             element?.scrollIntoView({behavior: 'smooth'});
           }, 1000);
-        });
+        }).finally(this.resetChallenge);
 
-        /*
-        * @dev disable loading
-        * */
-        this.isLoading = false;
-      }
+      /*
+      * @dev disable loading
+      * */
+      this.isLoading = false;
     }
-  })
+  }
+})
 </script>
 
 <template>
@@ -209,17 +237,17 @@ export default Vue.extend({
     </div>
 
     <!--  sms code  -->
-    <div class="form-control w-full">
-      <label class="label">
-        <span class="label-text">СМС Код</span>
-        <span class="label-text-alt"></span>
-      </label>
-      <input v-model="code" type="text" placeholder="Ваш СМС код" class="input input-bordered w-full"/>
-      <label class="label">
-        <span class="label-text-alt">СМС код для отправки</span>
-        <span class="label-text-alt">не обязательно</span>
-      </label>
-    </div>
+<!--    <div class="form-control w-full">-->
+<!--      <label class="label">-->
+<!--        <span class="label-text">СМС Код</span>-->
+<!--        <span class="label-text-alt"></span>-->
+<!--      </label>-->
+<!--      <input v-model="code" type="text" placeholder="Ваш СМС код" class="input input-bordered w-full"/>-->
+<!--      <label class="label">-->
+<!--        <span class="label-text-alt">СМС код для отправки</span>-->
+<!--        <span class="label-text-alt">не обязательно</span>-->
+<!--      </label>-->
+<!--    </div>-->
 
     <!--   sending flag   -->
     <div class="form-control w-full">
@@ -232,12 +260,12 @@ export default Vue.extend({
     <!--  handler button  -->
     <div class="mt-4 grid grid-cols-3 gap-2 items-center w-full">
       <div></div>
-      <button @click="createCode" :disabled="disabledButton || isLoading" class="btn btn-accent">
-        Создать сессию
+      <button @click="createCode" :disabled="disabledButton || isLoading || challengeLoading" class="btn btn-accent">
+        {{ challengeLoading ? "Challenge processing..." : "Создать сессию" }}
       </button>
       <NuxtLink to="/playground/send-code" disabled class="flex items-center justify-center gap-2 text-secondary group">
         <span>Отправка кода</span>
-        <GrommetIconsLinkNext class="group-hover:translate-x-2 transition-all" />
+        <GrommetIconsLinkNext class="group-hover:translate-x-2 transition-all"/>
       </NuxtLink>
     </div>
 

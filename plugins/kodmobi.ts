@@ -28,13 +28,15 @@ const KodMobiPlugin: Plugin = (context: Context, inject: Inject) => {
       * */
       this.SECRET_KEY = context.store.getters['kod-mobi.store/getSecretKey'];
 
+      this.CHALLENGE_TOKEN = context.store.getters['challenge.store/getToken'];
+      this.ACTION = context.store.getters['challenge.store/getAction'];
+
       return this;
     },
     encryptCode(message: string, algo: string) : void {
       try {
         // const code: string | null = context.store.getters['kod-mobi.store/getCode'];
         // const algo: string = 'aes-256-cbc';
-
 
         if (!this.SECRET_KEY) {
           context.$toast.error(`Заполните Secret Key`, {
@@ -49,7 +51,6 @@ const KodMobiPlugin: Plugin = (context: Context, inject: Inject) => {
             .substring(0, 32);
 
         const iv = crypto.randomBytes(16);
-
 
         const cipher = crypto.createCipheriv(algo, secretKey, iv);
 
@@ -86,7 +87,8 @@ const KodMobiPlugin: Plugin = (context: Context, inject: Inject) => {
 
           const result: KodMobiCreateResponseType = await context.$axios.$post<KodMobiCreateResponseType>(this.BASE_URL + '/message/create', params, {
             headers: {
-              'x-api-key': this.API_KEY
+              'x-api-key': this.API_KEY,
+              'X-CF-TURNSTILE-TOKEN': this.CHALLENGE_TOKEN,
             },
             progress: false
           });
@@ -141,7 +143,8 @@ const KodMobiPlugin: Plugin = (context: Context, inject: Inject) => {
           * */
           const result: KodMobiSendResponseType = await context.$axios.$post<KodMobiSendResponseType>(this.BASE_URL+ '/message/send', params, {
             headers: {
-              'x-api-key': this.API_KEY
+              'x-api-key': this.API_KEY,
+              'X-CF-TURNSTILE-TOKEN': this.CHALLENGE_TOKEN,
             },
             progress: false
           });
@@ -190,7 +193,8 @@ const KodMobiPlugin: Plugin = (context: Context, inject: Inject) => {
           * */
           const result: KodMobiCheckResponseType = await context.$axios.$post<KodMobiCheckResponseType>(this.BASE_URL+ '/message/check', params, {
             headers: {
-              'x-api-key': this.API_KEY
+              'x-api-key': this.API_KEY,
+              'X-CF-TURNSTILE-TOKEN': this.CHALLENGE_TOKEN,
             },
             progress: false
           });
@@ -243,7 +247,8 @@ const KodMobiPlugin: Plugin = (context: Context, inject: Inject) => {
           * */
           const result: KodMobiVerifyResponseType = await context.$axios.$post<KodMobiVerifyResponseType>(this.BASE_URL+ '/message/verify', params, {
             headers: {
-              'x-api-key': this.SECRET_KEY
+              'x-api-key': this.SECRET_KEY,
+              'X-CF-TURNSTILE-TOKEN': this.CHALLENGE_TOKEN,
             },
             progress: false
           });

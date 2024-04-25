@@ -7,6 +7,8 @@ import Endpoint from "~/components/endpoint.component.vue";
 import {RestMethod} from "~/common/enums/rest.enum";
 import GrommetIconsLinkNext from "~/components/icons/next-link.component.vue";
 import GrommetIconsLinkPrevious from "~/components/icons/prev-link.component.vue";
+import Challenge from "~/components/challenge.component.vue";
+import {ChallengeAction} from "~/common/enums/challenge.enum";
 
 export default Vue.extend({
   data() {
@@ -14,7 +16,10 @@ export default Vue.extend({
       isLoading: false
     }
   },
-  components: {GrommetIconsLinkPrevious, GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation},
+  components: {
+    Challenge,
+    GrommetIconsLinkPrevious, GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation
+  },
   computed: {
     RestMethod() {
       return RestMethod
@@ -73,12 +78,36 @@ export default Vue.extend({
     getHeaders() {
       const headers: KodMobiHeaders = {
         'x-api-key': this.apiKey,
+        'X-CF-TURNSTILE-TOKEN': this.token,
       }
 
       return headers;
+    },
+    action: {
+      get() {
+        return this.$store.getters['challenge.store/getAction'];
+      },
+      set(value: ChallengeAction) {
+        this.$store.commit('challenge.store/setAction', value);
+      }
+    },
+    token: {
+      get() {
+        return this.$store.getters['challenge.store/getToken'];
+      },
+      set(value: string | null) {
+        this.$store.commit('challenge.store/setToken', value);
+      }
+    },
+    challengeLoading(): boolean {
+      const token: string = this.$store.getters['challenge.store/getToken'];
+      const siteKey: string = this.$store.getters['kod-mobi.store/getTurnstileSiteKey'];
+      return !token && !!siteKey
     }
   },
   mounted() {
+    this.resetChallenge();
+
     if ('OTPCredential' in window) {
       const ac = new AbortController();
 
@@ -102,6 +131,10 @@ export default Vue.extend({
     }
   },
   methods: {
+    resetChallenge() {
+      this.token = null;
+      this.action = ChallengeAction.SEND;
+    },
     async sendCode() {
       /*
       * @dev enable loading
@@ -119,7 +152,7 @@ export default Vue.extend({
             const element: HTMLElement | null = document.getElementById('send-response')
             element?.scrollIntoView({behavior: 'smooth'});
           }, 1000);
-        });
+        }).finally(this.resetChallenge);
 
       this.isLoading = false;
     }
@@ -187,8 +220,9 @@ export default Vue.extend({
         <GrommetIconsLinkPrevious class="group-hover:-translate-x-2 transition-all"/>
         <span>Создание сессии</span>
       </NuxtLink>
-      <button @click="sendCode" :disabled="disabledButton || isLoading" class="btn btn-accent">
-        Отправить сообщение
+      <button @click="sendCode" :disabled="disabledButton || isLoading || challengeLoading" class="btn btn-accent">
+        {{ challengeLoading ? "Challenge processing..." : "Отправить сообщение" }}
+
       </button>
       <NuxtLink to="/playground/check-code" disabled
                 class="flex items-center justify-center gap-2 text-secondary group">

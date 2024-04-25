@@ -28,5 +28,6 @@
     "postcss": "^8.4.17",
     "sass": "^1.69.5",
     "sass-loader": "10"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }

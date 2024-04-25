@@ -2,16 +2,13 @@
 import Vue from 'vue'
 import GrommetIconsCircleInformation from "~/components/icons/info.component.vue";
 import Response from "~/components/response.component.vue";
-import {
-  KodMobiCheckCodeRequest,
-  KodMobiCheckResponseType,
-  KodMobiCreateResponseType, KodMobiHeaders,
-  KodMobiSendResponseType
-} from "~/common/types/kod-mobi.type";
+import {KodMobiCheckCodeRequest, KodMobiCheckResponseType, KodMobiHeaders} from "~/common/types/kod-mobi.type";
 import Endpoint from "~/components/endpoint.component.vue";
 import {RestMethod} from "~/common/enums/rest.enum";
 import GrommetIconsLinkNext from "~/components/icons/next-link.component.vue";
 import GrommetIconsLinkPrevious from "~/components/icons/prev-link.component.vue";
+import Challenge from "~/components/challenge.component.vue";
+import {ChallengeAction} from "~/common/enums/challenge.enum";
 
 export default Vue.extend({
   data() {
@@ -19,7 +16,10 @@ export default Vue.extend({
       isLoading: false
     }
   },
-  components: {GrommetIconsLinkPrevious, GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation},
+  components: {
+    Challenge,
+    GrommetIconsLinkPrevious, GrommetIconsLinkNext, Endpoint, Response, GrommetIconsCircleInformation
+  },
   computed: {
     RestMethod() {
       return RestMethod
@@ -75,12 +75,41 @@ export default Vue.extend({
     getHeaders() {
       const headers: KodMobiHeaders = {
         'x-api-key': this.apiKey,
+        'X-CF-TURNSTILE-TOKEN': this.token,
       }
 
       return headers;
+    },
+    action: {
+      get() {
+        return this.$store.getters['challenge.store/getAction'];
+      },
+      set(value: ChallengeAction) {
+        this.$store.commit('challenge.store/setAction', value);
+      }
+    },
+    token: {
+      get() {
+        return this.$store.getters['challenge.store/getToken'];
+      },
+      set(value: string | null) {
+        this.$store.commit('challenge.store/setToken', value);
+      }
+    },
+    challengeLoading(): boolean {
+      const token: string = this.$store.getters['challenge.store/getToken'];
+      const siteKey: string = this.$store.getters['kod-mobi.store/getTurnstileSiteKey'];
+      return !token && !!siteKey
     }
   },
+  mounted() {
+    this.resetChallenge();
+  },
   methods: {
+    resetChallenge() {
+      this.token = null;
+      this.action = ChallengeAction.CHECK;
+    },
     async checkCode() {
       /*
       * @dev enable loading
@@ -96,9 +125,9 @@ export default Vue.extend({
           * */
           setTimeout(() => {
             const element: HTMLElement | null = document.getElementById('check-response')
-            element?.scrollIntoView({ behavior: 'smooth' });
+            element?.scrollIntoView({behavior: 'smooth'});
           }, 1000);
-        });
+        }).finally(this.resetChallenge);
 
       this.isLoading = false;
     }
@@ -110,7 +139,7 @@ export default Vue.extend({
   <div class="flex flex-col items-center justify-start h-full w-full mt-4 p-4 rounded-2xl bg-base-200">
     <h1 class="text-2xl">Проверка кода</h1>
 
-    <Endpoint :method="RestMethod.POST" path="/message/check" />
+    <Endpoint :method="RestMethod.POST" path="/message/check"/>
 
     <!--  phone  -->
     <div class="form-control w-full">
@@ -157,15 +186,16 @@ export default Vue.extend({
     <!--  handler button  -->
     <div class="mt-4 grid grid-cols-3 gap-2 items-center w-full">
       <NuxtLink to="/playground/send-code" disabled class="flex items-center justify-center gap-2 text-secondary group">
-        <GrommetIconsLinkPrevious class="group-hover:-translate-x-2 transition-all" />
+        <GrommetIconsLinkPrevious class="group-hover:-translate-x-2 transition-all"/>
         <span>Отправка кода</span>
       </NuxtLink>
-      <button @click="checkCode" :disabled="disabledButton || isLoading" class="btn btn-accent">
-        Проверить код
+      <button @click="checkCode" :disabled="disabledButton || isLoading || challengeLoading" class="btn btn-accent">
+        {{ challengeLoading ? "Challenge processing..." : "Проверить код" }}
       </button>
-      <NuxtLink to="/playground/verify-token" disabled class="flex items-center justify-center gap-2 text-secondary group">
+      <NuxtLink to="/playground/verify-token" disabled
+                class="flex items-center justify-center gap-2 text-secondary group">
         <span>Проверка токена</span>
-        <GrommetIconsLinkNext class="group-hover:translate-x-2 transition-all" />
+        <GrommetIconsLinkNext class="group-hover:translate-x-2 transition-all"/>
       </NuxtLink>
     </div>
 
