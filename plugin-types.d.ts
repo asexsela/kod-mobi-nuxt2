@@ -25,3 +25,9 @@ declare module 'vuex/types/index' {
     $kodmobi: IKodMobiPlugin
   }
 }
+
+declare global {
+  interface Window {
+    turnstile: any
+  }
+}

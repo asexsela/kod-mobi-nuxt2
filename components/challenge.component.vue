@@ -45,8 +45,9 @@ export default Vue.extend({
       if (!this.siteKey) {
         return;
       }
-      window.turnstile.ready(() => {
-        this.id = window.turnstile.render('.cf-turnstile', {
+
+      window?.turnstile.ready(() => {
+        this.id = window?.turnstile.render('.cf-turnstile', {
           sitekey: this.siteKey,
           action: this.action,
           refreshExpired: this.reset,
@@ -59,7 +60,7 @@ export default Vue.extend({
         return;
       }
       if (this.id) {
-        window.turnstile.remove(this.id);
+        window?.turnstile.remove(this.id);
       }
 
       this.init();
