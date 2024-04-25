@@ -59,7 +59,7 @@ export default Vue.extend({
         return;
       }
       if (this.id) {
-        turnstile.remove(this.id);
+        window.turnstile.remove(this.id);
       }
 
       this.init();
