@@ -126,6 +126,7 @@ export default Vue.extend({
     }
   },
   mounted() {
+    this.resetChallenge();
     if ('OTPCredential' in window) {
       const ac = new AbortController();
 
